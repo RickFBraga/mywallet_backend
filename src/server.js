@@ -11,10 +11,10 @@ server.use(json());
 server.use(cors());
 
 server.use(authRouter);
-
 server.use(transactionsRouter);
 
-const port = process.env.PORT || 3000;
-server.listen(port, () => {
+const port = process.env.PORT || 4000;
+
+server.listen(port, "0.0.0.0", () => {
   console.log(`Servidor rodando na porta ${port}`);
 });
