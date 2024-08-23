@@ -15,6 +15,6 @@ server.use(authRouter);
 server.use(transactionsRouter);
 
 const port = process.env.PORT || 3000;
-server.listen(PORT, () => {
+server.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
 });
