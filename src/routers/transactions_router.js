@@ -9,10 +9,14 @@ const transactionsRouter = Router();
 
 transactionsRouter.post("/transactions", tokenValidate, transaction);
 
-transactionsRouter.get("/transactions", transaction_list);
+transactionsRouter.get("/transactions", tokenValidate, transaction_list);
 
-transactionsRouter.put("/transactions/:id", editTransactions);
+transactionsRouter.put("/transactions/:id", tokenValidate, editTransactions);
 
-transactionsRouter.delete("/transactions/:id", deleteTransactions);
+transactionsRouter.delete(
+  "/transactions/:id",
+  tokenValidate,
+  deleteTransactions
+);
 
 export default transactionsRouter;

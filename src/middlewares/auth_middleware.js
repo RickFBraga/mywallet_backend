@@ -14,7 +14,7 @@ export async function tokenValidate(req, res, next) {
       if (error) return res.sendStatus(401);
 
       const authToken = await db.collection("sessions").findOne({ token });
-      if (!authToken) return res.status(401).send("Unathorized");
+      if (!authToken) return res.status(401).send("Unauthorized");
 
       const user = await db.collection("cadastros").findOne({
         _id: authToken.userId,
@@ -26,5 +26,6 @@ export async function tokenValidate(req, res, next) {
     });
   } catch (err) {
     console.log(err.message);
+    return res.status(500).json({ error: err.message });
   }
 }

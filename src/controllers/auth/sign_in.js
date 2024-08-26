@@ -15,39 +15,34 @@ export async function signIn(req, res) {
   });
 
   if (validation.error) {
-    return res.status(422).send("Unprocessable Entity");
+    return res.status(422).json({
+      error: "Unprocessable Entity",
+      details: validation.error.details.map((err) => err.message),
+    });
   }
 
   try {
-    const user = await db
-      .collection("cadastros")
-      .findOne({ email: dadosLogin.email });
+    const user = await db.collection("cadastros").findOne({ email });
 
     if (!user) {
-      return res.status(404).send("Not Found");
+      return res.status(401).send("Invalid credentials");
     }
 
-    const passwordMatch = bcrypt.compareSync(
-      dadosLogin.password,
-      user.password
-    );
+    const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
-      return res.status(401).send("Unauthorized");
-    } else {
-      const token = jwt.sign({}, process.env.JWT_SECRET_KEY, {
-        expiresIn: 86400,
-      });
-
-      const session = {
-        token,
-        userId: user._id,
-      };
-      await db.collection("sessions").insertOne(session);
-      return res.send(token);
+      return res.status(401).send("Invalid credentials");
     }
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
+      expiresIn: 86400,
+    });
+
+    await db.collection("sessions").insertOne({ token, userId: user._id });
+
+    return res.status(200).json({ token });
   } catch (err) {
-    console.log(err.message);
-    res.status(500).send("Internal Server Error");
+    console.error("Error during sign-in:", err.message);
+    return res.status(500).send("Internal Server Error");
   }
 }

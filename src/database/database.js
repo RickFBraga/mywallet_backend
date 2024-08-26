@@ -9,10 +9,7 @@ if (!mongoUri) {
   throw new Error("DATABASE_URL is not defined in the environment variables");
 }
 
-const mongoClient = new MongoClient(mongoUri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+const mongoClient = new MongoClient(mongoUri);
 
 export let db;
 

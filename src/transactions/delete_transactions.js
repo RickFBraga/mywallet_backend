@@ -27,19 +27,27 @@ export default async function deleteTransactions(req, res) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
     const userId = decoded.userId;
+    console.log("User ID from token:", userId);
 
-    const checkExistingId = await db.collection("transactions").findOne({
+    const session = await db.collection("sessions").findOne({
+      userId: new ObjectId(userId),
+    });
+
+    if (!session) {
+      return res.status(404).json({ error: "Not Found" });
+    }
+
+    const transaction = await db.collection("transactions").findOne({
       _id: new ObjectId(id),
     });
 
-    if (!checkExistingId) {
-      return res.status(404).send("Not Found");
+    if (!transaction) {
+      return res.status(404).json({ error: "Not Found" });
     }
 
-    if (checkExistingId.userId !== userId) {
-      return res.status(401).send("Unauthorized");
+    if (session.userId.toString() !== userId) {
+      return res.status(401).json({ error: "Unauthorized" });
     }
-
     await db.collection("transactions").deleteOne(
       {
         _id: new ObjectId(id),

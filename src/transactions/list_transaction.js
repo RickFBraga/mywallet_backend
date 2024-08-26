@@ -1,12 +1,7 @@
 import { db } from "../database/database.js";
 
 export default async function transaction_list(req, res) {
-  const { authorization } = req.headers;
-  const token = authorization?.replace("Bearer", "").trim();
-
-  if (!token) return res.status(401).send("Unauthorized");
-
-  const page = req.query.page || 1;
+  const page = parseInt(req.query.page, 10) || 1;
 
   if (page <= 0) {
     return res.status(400).send("Bad Request");
@@ -23,8 +18,9 @@ export default async function transaction_list(req, res) {
       .limit(limit)
       .toArray();
 
-    res.send(transactionsList);
+    return res.status(200).json(transactionsList);
   } catch (err) {
-    console.log(err.message);
+    console.error("Error fetching transactions:", err.message);
+    return res.status(500).send("Internal Server Error");
   }
 }

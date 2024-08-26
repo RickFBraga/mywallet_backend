@@ -21,35 +21,38 @@ export default async function editTransactions(req, res) {
   });
 
   if (validation.error) {
-    return res.status(422).send("Unprocessable Entity");
+    return res.status(422).json({
+      error: "Unprocessable Entity",
+      details: validation.error.details.map((err) => err.message),
+    });
   }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
     const userId = decoded.userId;
+    console.log("User ID from token:", userId);
 
-    const checkExistingId = await db.collection("transactions").findOne({
-      _id: new ObjectId(id),
+    const session = await db.collection("sessions").findOne({
+      userId: new ObjectId(userId),
     });
 
-    if (!checkExistingId) {
-      return res.status(404).send("Not Found");
+    if (!session) {
+      return res.status(404).json({ error: "Not Found" });
     }
 
-    if (checkExistingId.userId !== userId) {
-      return res.status(401).send("Unauthorized");
+    if (session.userId.toString() !== userId) {
+      return res.status(401).json({ error: "Unauthorized" });
     }
 
-    await db.collection("transactions").updateOne(
-      {
-        _id: new ObjectId(id),
-      },
-      {
-        $set: transactionData,
-      }
-    );
-    return res.status(204).send("No Content");
+    await db
+      .collection("transactions")
+      .updateOne({ _id: new ObjectId(id) }, { $set: transactionData });
+
+    return res.status(204).send();
   } catch (err) {
-    return res.status(500).send(err.message);
+    console.error("Error during transaction update:", err.message);
+    return res
+      .status(500)
+      .json({ error: "Internal Server Error", message: err.message });
   }
 }
