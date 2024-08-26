@@ -28,7 +28,7 @@ export default async function editTransactions(req, res) {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.userId;
     console.log("User ID from token:", userId);
 

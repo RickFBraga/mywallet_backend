@@ -1,24 +1,15 @@
 import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
-
 dotenv.config();
 
-const mongoUri = process.env.DATABASE_URL;
+const mongoUrl = process.env.DATABASE_URL;
+const mongoClient = new MongoClient(mongoUrl);
 
-if (!mongoUri) {
-  throw new Error("DATABASE_URL is not defined in the environment variables");
+try {
+  await mongoClient.connect();
+  console.log("MongoDB conectado!");
+} catch (error) {
+  console.log(error.message);
 }
 
-const mongoClient = new MongoClient(mongoUri);
-
-export let db;
-
-mongoClient
-  .connect()
-  .then(() => {
-    db = mongoClient.db();
-    console.log("Banco de Dados conectado com sucesso!");
-  })
-  .catch((err) =>
-    console.error("Erro ao conectar ao banco de dados:", err.message)
-  );
+export const db = mongoClient.db();

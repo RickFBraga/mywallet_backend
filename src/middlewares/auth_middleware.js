@@ -10,7 +10,7 @@ export async function tokenValidate(req, res, next) {
   if (!token) return res.status(401).send("Unauthorized");
 
   try {
-    jwt.verify(token, process.env.JWT_SECRET_KEY, async (error, decoded) => {
+    jwt.verify(token, process.env.JWT_SECRET, async (error, decoded) => {
       if (error) return res.sendStatus(401);
 
       const authToken = await db.collection("sessions").findOne({ token });
