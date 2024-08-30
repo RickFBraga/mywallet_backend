@@ -5,11 +5,15 @@ dotenv.config();
 const mongoUrl = process.env.DATABASE_URL;
 const mongoClient = new MongoClient(mongoUrl);
 
-try {
-  await mongoClient.connect();
-  console.log("MongoDB conectado!");
-} catch (error) {
-  console.log(error.message);
+function handleError(error) {
+  console.error("Database conection error: ", error.message);
+}
+
+export async function connectDb() {
+  await mongoClient
+    .connect()
+    .then(console.log("MongoDB Connected"))
+    .catch((error) => handleError(error));
 }
 
 export const db = mongoClient.db();
