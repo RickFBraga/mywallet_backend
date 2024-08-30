@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import authRouter from './routers/auth_router.js';
 import transactionsRouter from './routers/transactions_router.js';
-
+import { db } from './database/database.js';
 dotenv.config();
 
 const server = express();
