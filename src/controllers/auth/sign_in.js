@@ -34,7 +34,7 @@ export async function signIn(req, res) {
       return res.status(401).send("Invalid credentials");
     }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: 86400,
     });
 
